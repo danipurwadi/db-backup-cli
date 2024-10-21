@@ -10,3 +10,5 @@ services:
     # Important to bind/mount your codebase dir to /app dir for live reload
     volumes:
       - ./:/app
+    environment:
+      - APP_FLAGS=-n asd -t postgres -u root -w 123456 -d http://localhost:8080
