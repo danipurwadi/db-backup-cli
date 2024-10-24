@@ -43,7 +43,8 @@ func main() {
 	switch dt := dbType(config.DbType); dt {
 	case pg:
 		service := postgres.NewPostgresClient(&config)
-		err := service.Backup()
+		conn, err := service.Initialise()
+		err := service.Backup(conn)
 		if err != nil {
 			log.Fatal("failed to perform backup for postgres", err)
 		}
