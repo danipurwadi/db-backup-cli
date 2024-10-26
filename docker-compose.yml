@@ -1,20 +1,5 @@
 version: "3.8"
 services:
-  app:
-    container_name: db-backup-cli
-    build:
-      context: .
-      # Correct the path to your Dockerfile
-      dockerfile: Dockerfile
-    ports:
-      - 8080:3000
-    # Important to bind/mount your codebase dir to /app dir for live reload
-    volumes:
-      - ./:/app
-    environment:
-      - APP_FLAGS=-t postgres -d db_name -u root -w 123456 -h postgres://postgres:password@postgres:5432/test_db?sslmode=disable
-    depends_on:
-      - postgres
   postgres:
     container_name: postgres-db
     image: postgres
