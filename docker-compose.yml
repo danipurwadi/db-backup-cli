@@ -1,6 +1,7 @@
 version: "3.8"
 services:
-  web:
+  app:
+    container_name: db-backup-cli
     build:
       context: .
       # Correct the path to your Dockerfile
@@ -11,4 +12,21 @@ services:
     volumes:
       - ./:/app
     environment:
-      - APP_FLAGS=-t postgres -d db_name -u root -w 123456 -h http://localhost:8080
+      - APP_FLAGS=-t postgres -d db_name -u root -w 123456 -h postgres://postgres:password@postgres:5432/test_db?sslmode=disable
+    depends_on:
+      - postgres
+  postgres:
+    container_name: postgres-db
+    image: postgres
+    hostname: localhost
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+volumes:
+  postgres-data:

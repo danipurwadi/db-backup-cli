@@ -44,10 +44,18 @@ func main() {
 	case pg:
 		service := postgres.NewPostgresClient(&config)
 		conn, err := service.Initialise()
-		err := service.Backup(conn)
 		if err != nil {
-			log.Fatal("failed to perform backup for postgres", err)
+			log.Printf("failed to connect to postgres db %s \n", err)
+			return
 		}
+		log.Println("successfully connected to postgres!")
+		err = service.Backup(conn)
+		if err != nil {
+			log.Fatal("failed to perform backup for postgres ", err)
+			return
+		}
+
+		log.Println("successfully backed up!")
 	}
 }
 
