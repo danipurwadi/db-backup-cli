@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"log/slog"
 	"slices"
 
 	"github.com/danipurwadi/db-backup-cli/business/core/postgres"
@@ -24,7 +25,7 @@ func AllDbs() []dbType {
 }
 
 func main() {
-	log.Println("starting CLI application...")
+	slog.Info("starting CLI application...")
 
 	config := config.Config{}
 	flag.StringVar(&config.DbName, "d", "", "db name")
@@ -32,30 +33,31 @@ func main() {
 	flag.StringVar(&config.DbUrl, "h", "", "host url")
 	flag.StringVar(&config.Username, "u", "", "username")
 	flag.StringVar(&config.Password, "w", "", "password")
+	flag.StringVar(&config.Tables, "n", "", "table names")
 	flag.Parse()
 
 	err := validateConfig(&config)
 	if err != nil {
-		log.Fatal("failed to startup application due to invalid config", err)
+		slog.Error("failed to startup application due to invalid config", "err", err)
+		return
 	}
-	log.Printf("successfully loaded configs %+v \n", config)
-
 	switch dt := dbType(config.DbType); dt {
 	case pg:
-		service := postgres.NewPostgresClient(&config)
-		conn, err := service.Initialise()
+		service := postgres.NewPostgresCore(&config)
+		conn, err := service.Connect()
 		if err != nil {
-			log.Printf("failed to connect to postgres db %s \n", err)
-			return
-		}
-		log.Println("successfully connected to postgres!")
-		err = service.Backup(conn)
-		if err != nil {
-			log.Fatal("failed to perform backup for postgres ", err)
+			slog.Error("failed to connect to postgres db", "err", err)
 			return
 		}
 
-		log.Println("successfully backed up!")
+		slog.Info("successfully connected to postgres!")
+		err = service.Backup(conn)
+		if err != nil {
+			slog.Error("failed to perform backup for postgres", "err", err)
+			return
+		}
+
+		slog.Info("successfully perform backup!")
 	}
 }
 

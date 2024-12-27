@@ -6,4 +6,5 @@ type Config struct {
 	DbUrl    string
 	Username string
 	Password string
+	Tables   string
 }
